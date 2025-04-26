@@ -1,11 +1,24 @@
 {
-  "name": "typescript-homework-module-3",
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "typescript": "^5.1.5"
-  }
+    "name": "typescript-homework-module-3",
+    "version": "1.0.0",
+    "description": "",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "scripts": {
+        "clean": "rimraf dist",
+        "build": "npm run clean && tsc",
+        "ts:watch": "tsc --watch",
+        "start": "web-dev-server --node-resolve --open --watch --root-dir .",
+        "dev": "concurrently \"npm run ts:watch\" \"npm run start\""
+    },
+    "dependencies": {
+        "typescript": "^5.1.5"
+    },
+    "devDependencies": {
+        "@web/dev-server": "^0.4.6",
+        "concurrently": "^9.1.2",
+        "rimraf": "^6.0.1",
+        "typescript": "^5.8.3"
+    }
 }
