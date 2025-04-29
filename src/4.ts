@@ -1,3 +1,4 @@
+import { constructors } from './../node_modules/@web/dev-server-core/src/dom5/modification';
 // У цьому завдання вам належить реалізувати сценарій життя, де людина, ключ і будинок взаємодіють один з одним.
 
 // Ключ (Key): Створіть клас Key. У нього має бути одна приватна властивість signature, яка генерується випадково при створенні об'єкта цього класу (наприклад Math.random()).
@@ -20,12 +21,17 @@
 
 class Key {
     private signature: number;
-    constructor() {
-        this.signature = Math.random();
-        console.log(
-            'Once new Person created we are  logging key signature',
-            this.signature
-        );
+    private constructor(signature?: number) {
+        this.signature = signature ?? Math.random();
+        console.log('🔑 Ключ создан с подписью:', this.signature);
+    }
+    static createKey(): Key {
+        return new Key(); // Статичний метод для створення нового ключа
+    }
+
+    static cloneFromKey(originalKey: Key): Key {
+        // создаём подделку с той же подписью
+        return new Key(originalKey.getSignature());
     }
 
     getSignature(): number {
@@ -45,29 +51,55 @@ class Person {
 abstract class House {
     door: boolean = false;
     key: Key;
+    tenants: Person[] = [];
 
-    comeIn(person: Person): void {}
+    constructor(key: Key) {
+        this.key = key;
+    }
 
+    comeIn(person: Person): void {
+        if (this.door) {
+            this.tenants.push(person);
+            console.log('Person has come in!');
+        } else {
+            console.log('Door is closed!');
+        }
+    }
+    getTenants(): Person[] {
+        return this.tenants;
+    }
     abstract openDoor(key: Key): void;
 }
 
-// class MyHouse(key: Key) extends House {
+class MyHouse extends House {
+    constructor(key: Key) {
+        super(key); // Передаём ключ в родительский конструктор
+    }
 
-//     openDoor(key: Key): void {
-//         if (key.getSignature() === this.key.getSignature()) {
-//             this.door = true;
-//             console.log('Door is opened!');
-//         } else {
-//             console.log('Wrong key! Door remains closed.');
-//         }
-//     }
-// }
-const key = new Key();
+    openDoor(key: Key): void {
+        if (key === this.key) {
+            this.door = true;
+            console.log('Door is now open.');
+        } else {
+            this.door = false;
+            console.log('Wrong key!');
+        }
+    }
+}
+
+// 🎬 Симуляция "жизни"
+const key = Key.createKey();
 const person = new Person(key);
+const house = new MyHouse(key);
+house.openDoor(person.getKey());
+house.comeIn(person);
 
-// const house = new MyHouse(key);
-// house.openDoor(person.getKey());
+const clonedKey = Key.cloneFromKey(key); // 🧑‍🎤 ключ-подделка
+const stranger = new Person(clonedKey);
 
-// house.comeIn(person);
+house.openDoor(stranger.getKey()); // ❌ Wrong key!
+house.comeIn(stranger); // ❌ не пустят
+
+console.log('Tenants in the house:', house.getTenants());
 
 export {};
